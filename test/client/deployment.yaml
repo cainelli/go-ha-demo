@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: client-go-ha-demo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: client-go-ha-demo
+    spec:
+      containers:
+      - name: client
+        image: cainelli/client-go-ha-demo
+        env:
+          - name: ENDPOINT
+            value: http://go-ha-demo.default
+          - name: INTERVAL
+            value: "1"
+          - name: TIMEOUT
+            value: "3"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64m
+          limits:
+            cpu: 100m
+            memory: 64m

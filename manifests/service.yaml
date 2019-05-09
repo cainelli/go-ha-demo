@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: go-ha-demo
+spec:
+  selector:
+    app: go-ha-demo
+  type: ClusterIP
+  ports:
+  - name:  http
+    port:  80
+    targetPort:  8000
