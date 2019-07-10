@@ -34,7 +34,7 @@ func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// ReadinessHandler is the health check endpoint handler
+// ReadinessHandler is the readiness check endpoint handler
 func (s *Server) ReadinessHandler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(time.Duration(s.Config.Delay) * time.Second)
 
