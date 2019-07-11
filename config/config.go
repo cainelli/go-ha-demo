@@ -8,7 +8,7 @@ type Config struct {
 	WarmingUp bool `json:"warmingup,omitempty"`
 }
 
-// Load config from files and environment
+// Load default config
 func Load() *Config {
 	c := Config{
 		Healthy:   true,
