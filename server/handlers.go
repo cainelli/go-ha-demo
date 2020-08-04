@@ -1,8 +1,13 @@
 package server
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
+
+	wrapperHTTP "gopkg.in/DataDog/dd-trace-go.v1/contrib/net/http"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -10,13 +15,41 @@ import (
 // IndexHandler handles /
 func (s *Server) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Access-Control-Expose-Headers", "x-some-header")
+
 	time.Sleep(time.Duration(s.Config.Delay) * time.Second)
 
 	if !s.Config.Healthy {
 		time.Sleep(120 * time.Second)
 	}
 
-	w.Write([]byte("Hello World!"))
+	url := r.URL.Query().Get("call")
+	if url != "" {
+		client := http.Client{}
+		wrapperHTTP.WrapRoundTripper()
+		wrapClient := wrapperHTTP.WrapClient(&client)
+		res, err := wrapClient.Get(url)
+
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		bodyBytes, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		w.Write(bodyBytes)
+	}
+
+	hostname, _ := os.Hostname()
+
+	w.Write([]byte(fmt.Sprintf("------------------------\nFrom server: %s\n", hostname)))
+	for k, v := range r.Header {
+		header := fmt.Sprintf("%s: %v\n", k, v)
+		w.Write([]byte(header))
+	}
 
 	log.Info("host: ", r.Host, " uri: ", r.RequestURI, " status: ", 200)
 

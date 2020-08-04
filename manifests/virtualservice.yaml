@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: website
+  namespace: service-a
+spec:
+  gateways:
+  - traveler-frontend/traveler
+  - mesh
+  hosts:
+  - website.testing12.gygtest.com
+  http:
+  - match:
+    - uri:
+        prefix: /service-a
+    rewrite:
+      uri: "/"
+      authority: service-a.service-a
+    route:
+    - destination:
+        host: service-a.service-a.svc.cluster.local

@@ -1,28 +1,33 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: client-go-ha-demo
+  name: partner-widgets
+  namespace: partner-widgets
+  labels:
+    app: partner-widgets
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: partner-widgets
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        app: client-go-ha-demo
+        app: partner-widgets
     spec:
       containers:
       - name: client
         image: cainelli/client-go-ha-demo
         env:
           - name: ENDPOINT
-            value: http://go-ha-demo.default
+            value: http://fishfarm.fishfarm
           - name: INTERVAL
             value: "1"
           - name: TIMEOUT
             value: "3"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64m
-          limits:
-            cpu: 100m
-            memory: 64m
+      restartPolicy: Always

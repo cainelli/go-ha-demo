@@ -1,11 +1,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: service-a
+  name: service-a-staging
   namespace: service-a
 spec:
   selector:
-    app: service-a
+    app: service-a-staging
   type: ClusterIP
   ports:
   - name:  http
@@ -15,11 +15,11 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: service-b
+  name: service-b-staging
   namespace: service-b
 spec:
   selector:
-    app: service-b
+    app: service-b-staging
   type: ClusterIP
   ports:
   - name:  http

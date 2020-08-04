@@ -13,6 +13,7 @@ type Server struct {
 
 // Init the HTTP endpoints
 func (server *Server) Init() {
+
 	// lifecycle endpoints
 	server.Router.HandleFunc("/_health", server.HealthCheckHandler)
 	server.Router.HandleFunc("/_ready", server.ReadinessHandler)

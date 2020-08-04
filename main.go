@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/gorilla/mux"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 func main() {
@@ -21,8 +22,15 @@ func main() {
 
 	var httpSrv *http.Server
 
+	tracer.Start(
+		tracer.WithServiceName(os.Getenv("APM_APPLICATION")),
+	)
+
+	defer tracer.Stop()
+
 	go func() {
 		conf := config.Load()
+
 		srv := &server.Server{Router: mux.NewRouter(), Config: conf}
 
 		srv.Init()

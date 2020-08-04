@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service-a
+  name: service-a-staging
   labels:
-    app: service-a
+    app: service-a-staging
   namespace: service-a
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: service-a
+      app: service-a-staging
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -18,12 +18,13 @@ spec:
   template:
     metadata:
       labels:
-        app: service-a
+        app: service-a-staging
     spec:
       containers:
       - image: cainelli/go-ha-demo:1.0.0-dev
         imagePullPolicy: Always
-        name: service-a
+        imagePullPolicy: Always
+        name: service-a-staging
         env:
           - name: APM_APPLICATION
             value: service-a
@@ -37,7 +38,7 @@ spec:
             memory: "128M"
           limits:
             cpu: "256m"
-            memory: "128M"
+            memory: "128M" 
         ports:
         - containerPort: 8000
           name: http
@@ -46,15 +47,15 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service-b
+  name: service-b-staging
   labels:
-    app: service-b
+    app: service-b-staging
   namespace: service-b
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: service-b
+      app: service-b-staging
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -63,15 +64,15 @@ spec:
   template:
     metadata:
       labels:
-        app: service-b
+        app: service-b-staging
     spec:
       containers:
       - image: cainelli/go-ha-demo:1.0.0-dev
         imagePullPolicy: Always
-        name: service-b
+        name: service-b-staging
         env:
           - name: APM_APPLICATION
-            value: "service-b"
+            value: service-b
           - name: DD_PROPAGATION_STYLE_INJECT
             value: B3
           - name: REDEPLOY
@@ -82,7 +83,7 @@ spec:
             memory: "128M"
           limits:
             cpu: "256m"
-            memory: "128M"
+            memory: "128M" 
         ports:
         - containerPort: 8000
           name: http
