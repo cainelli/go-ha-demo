@@ -1,5 +1,5 @@
-SHORT_NAME = go-ha-demo
-IMAGE = cainelli/go-ha-demo
+SHORT_NAME = simple-http-server
+IMAGE = cainelli/simple-http-server
 DEV_TAG = 1.0.0-dev
 GOOS ?= linux
 GOARCH ?= amd64
@@ -19,3 +19,6 @@ image-push:
 
 up:
 	go run main.go
+
+build:
+	go build -o simple-http-server cmd/main.go

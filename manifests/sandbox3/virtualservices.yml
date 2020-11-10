@@ -1,0 +1,59 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-a
+  namespace: service-a
+spec:
+  gateways:
+    - istio-system/internal-ingressgateway
+  hosts:
+    - service-a.service-a
+    - service-a.service-a.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: service-a.service-a.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: site
+  namespace: service-a
+spec:
+  gateways:
+    - istio-system/internal-ingressgateway
+    - mesh
+  hosts:
+    - www.guideyourget.com
+  http:
+    - route:
+        - destination:
+            host: service-a.service-a.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: service-a
+  namespace : service-a
+spec:
+  hosts:
+  - service-a.service-a.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  resolution: STATIC
+  endpoints:
+  - address: 10.20.2.52 # sandbox11
+    network: sandbox11
+    ports:
+      http: 8001
+  - address: 10.20.10.159 # sandbox11
+    network: sandbox11
+    ports:
+      http: 8001
+  - address: 10.20.7.196 # sandbox11
+    network: sandbox11
+    ports:
+      http: 8001

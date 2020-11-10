@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service-a-staging
+  name: service-a
   labels:
-    app: service-a-staging
+    app: service-a
   namespace: service-a
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: service-a-staging
+      app: service-a
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -17,45 +17,47 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        gyg.io/istio-proxy-pre-stop-sleep: "60"
       labels:
-        app: service-a-staging
+        app: service-a
     spec:
       containers:
-      - image: cainelli/go-ha-demo:1.0.0-dev
+      - image: cainelli/simple-http-server:1.0.0-dev
         imagePullPolicy: Always
-        imagePullPolicy: Always
-        name: service-a-staging
+        name: service-a
         env:
           - name: APM_APPLICATION
             value: service-a
           - name: DD_PROPAGATION_STYLE_INJECT
             value: B3
-          - name: REDEPLOY
-            value: "yesss"
+          - name: CLUSTER
+            value: "sandbox3"
         resources:
           requests:
-            cpu: "256m"
-            memory: "128M"
+            cpu: "64m"
+            memory: "32M"
           limits:
-            cpu: "256m"
-            memory: "128M" 
+            cpu: "64m"
+            memory: "32M"
         ports:
         - containerPort: 8000
           name: http
       restartPolicy: Always
+      terminationGracePeriodSeconds: 30
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service-b-staging
+  name: service-b
   labels:
-    app: service-b-staging
+    app: service-b
   namespace: service-b
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: service-b-staging
+      app: service-b
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -64,26 +66,26 @@ spec:
   template:
     metadata:
       labels:
-        app: service-b-staging
+        app: service-b
     spec:
       containers:
-      - image: cainelli/go-ha-demo:1.0.0-dev
+      - image: cainelli/simple-http-server:1.0.0-dev
         imagePullPolicy: Always
-        name: service-b-staging
+        name: service-b
         env:
           - name: APM_APPLICATION
-            value: service-b
+            value: "service-b"
           - name: DD_PROPAGATION_STYLE_INJECT
             value: B3
-          - name: REDEPLOY
-            value: "yesss"
+          - name: CLUSTER
+            value: "sandbox3"
         resources:
           requests:
-            cpu: "256m"
-            memory: "128M"
+            cpu: "64m"
+            memory: "32M"
           limits:
-            cpu: "256m"
-            memory: "128M" 
+            cpu: "64m"
+            memory: "32M"
         ports:
         - containerPort: 8000
           name: http

@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: internal-ingressgateway
+  namespace: istio-system
+spec:
+  selector:
+    app: internal-ingressgateway
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - "*"
+      port:
+        name: http
+        number: 80 # Istio Ingress Gateway Listen to port 8080 internally in the Pod.
+        protocol: HTTP2

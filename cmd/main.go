@@ -6,15 +6,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/cainelli/go-ha-demo/config"
-	"github.com/cainelli/go-ha-demo/server"
+	"github.com/getyourguide/simple-http-server/internal/pkg/config"
+	"github.com/getyourguide/simple-http-server/internal/pkg/server"
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
 	"net/http"
 	"time"
-
-	"gopkg.in/DataDog/dd-trace-go.v1/contrib/gorilla/mux"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 func main() {
@@ -22,14 +20,8 @@ func main() {
 
 	var httpSrv *http.Server
 
-	tracer.Start(
-		tracer.WithServiceName(os.Getenv("APM_APPLICATION")),
-	)
-
-	defer tracer.Stop()
-
 	go func() {
-		conf := config.Load()
+		conf := config.New()
 
 		srv := &server.Server{Router: mux.NewRouter(), Config: conf}
 

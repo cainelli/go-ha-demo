@@ -7,17 +7,13 @@ import (
 	"os"
 	"time"
 
-	wrapperHTTP "gopkg.in/DataDog/dd-trace-go.v1/contrib/net/http"
-
 	log "github.com/sirupsen/logrus"
 )
 
 // IndexHandler handles /
 func (s *Server) IndexHandler(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Access-Control-Expose-Headers", "x-some-header")
-
-	time.Sleep(time.Duration(s.Config.Delay) * time.Second)
+	// span, ctx := tracer.StartSpanFromContext(r.Context(), "post.process")
+	// defer span.Finish()
 
 	if !s.Config.Healthy {
 		time.Sleep(120 * time.Second)
@@ -25,10 +21,13 @@ func (s *Server) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	url := r.URL.Query().Get("call")
 	if url != "" {
-		client := http.Client{}
-		wrapperHTTP.WrapRoundTripper()
-		wrapClient := wrapperHTTP.WrapClient(&client)
-		res, err := wrapClient.Get(url)
+		client := &http.Client{}
+		req, err := http.NewRequestWithContext(r.Context(), "GET", url, nil)
+		if err != nil {
+			return
+		}
+
+		res, err := client.Do(req)
 
 		if err != nil {
 			log.Error(err)
@@ -45,7 +44,8 @@ func (s *Server) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	hostname, _ := os.Hostname()
 
-	w.Write([]byte(fmt.Sprintf("------------------------\nFrom server: %s\n", hostname)))
+	w.Write([]byte(fmt.Sprintf("------------------------\nFrom server: %s in cluster %s\n", hostname, os.Getenv("CLUSTER"))))
+	w.Write([]byte(fmt.Sprintf("URL: %s\n", r.URL.String())))
 	for k, v := range r.Header {
 		header := fmt.Sprintf("%s: %v\n", k, v)
 		w.Write([]byte(header))
@@ -57,7 +57,6 @@ func (s *Server) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // HealthCheckHandler is the health check endpoint handler
 func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	time.Sleep(time.Duration(s.Config.Delay) * time.Second)
 	status := 200
 	if !s.Config.Healthy {
 		status = 500
@@ -69,7 +68,6 @@ func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 // ReadinessHandler is the readiness check endpoint handler
 func (s *Server) ReadinessHandler(w http.ResponseWriter, r *http.Request) {
-	time.Sleep(time.Duration(s.Config.Delay) * time.Second)
 
 	status := 200
 	if !s.Config.Ready {
